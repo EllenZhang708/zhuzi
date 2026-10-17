@@ -15,7 +15,9 @@ RELEASES = f"https://github.com/{REPO}/releases/latest" if REPO else ""
 
 
 def _version(tag: str) -> tuple[int, ...]:
-    return tuple(int(n) for n in re.findall(r"\d+", tag)[:3])
+    """(major, minor, patch, 1 for a release or 0 for a pre-release such as
+    1.1.0-beta.1), so a beta's users still hear about the release it led to."""
+    return tuple(int(n) for n in re.findall(r"\d+", tag)[:3]) + (0 if "-" in tag else 1,)
 
 
 def newer_release() -> str | None:

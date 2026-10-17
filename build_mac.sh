@@ -27,6 +27,7 @@ case "$ARCH" in
   *) echo "unsupported processor: $ARCH" >&2; exit 1 ;;
 esac
 VERSION=$(sed -n 's/^APP_VERSION = "\(.*\)"/\1/p' src/core.py)
+SHORT=$(echo "$VERSION" | sed 's/[^0-9.].*//')  # macOS wants plain numbers: 1.1.0-beta.1 -> 1.1.0
 WORK="$HERE/build/mac"
 APP="$WORK/逐字.app"
 DMG="$HERE/dist/Zhuzi-mac-$FLAVOR.dmg"
@@ -91,8 +92,9 @@ PLIST="$APP/Contents/Info.plist"
 plist() { plutil -replace "$1" "$2" "$3" "$PLIST"; }
 plist CFBundleName -string "逐字"
 plist CFBundleDisplayName -string "逐字"
-plist CFBundleShortVersionString -string "$VERSION"
-plist CFBundleVersion -string "$VERSION"
+plist CFBundleShortVersionString -string "$SHORT"
+plist CFBundleVersion -string "$SHORT"
+plist CFBundleGetInfoString -string "逐字 $VERSION"
 plist LSMinimumSystemVersion -string "${MINOS:-$FLOOR}"
 plist LSApplicationCategoryType -string public.app-category.productivity
 plist NSHumanReadableCopyright -string "MIT License · github.com/EllenZhang708/zhuzi"

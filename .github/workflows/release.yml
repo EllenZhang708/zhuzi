@@ -128,3 +128,4 @@ jobs:
         with:
           files: artifacts/*
           draft: true  # review the notes, then publish by hand
+          prerelease: ${{ contains(github.ref_name, '-') }}  # v1.1.0-beta.1: not "latest"
