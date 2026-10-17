@@ -1,0 +1,30 @@
+# Environments and the local Python
+.venv*/
+.python/
+downloads/
+
+# Build output
+build/
+dist/
+__pycache__/
+*.pyc
+
+# Runtime data: settings (with keys), models, audio cache, logs, transcripts
+data/
+逐字稿/
+tests/out/
+tests/exe-out/
+tests/shots*/
+tests/ui*/
+
+# Never commit keys
+*key*.txt
+.env
+
+# Generated from AppIcon.png by assets/make_icon.py
+assets/icon.ico
+assets/icon.png
+assets/icon-preview.png
+
+# Personal notes
+下载记录.md

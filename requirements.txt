@@ -1,0 +1,12 @@
+# Every package here ships wheels for both win_amd64 and win_arm64, so Zhuzi
+# builds natively for x64 and ARM64 Windows. (No CTranslate2: it has no ARM64 wheel.)
+PySide6-Essentials==6.12.0
+av==19.0.1
+numpy==2.5.4
+onnxruntime==1.31.0
+sherpa-onnx==1.13.8
+opencc-python-reimplemented==0.1.7
+pypinyin==0.55.0
+# build only
+pyinstaller==6.22.3
+pillow==12.3.0
