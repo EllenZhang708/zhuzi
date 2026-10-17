@@ -1,7 +1,11 @@
 # Every package here ships wheels for win_amd64, win_arm64 and macOS (Apple
 # silicon and Intel), so Zhuzi builds natively for each. (No CTranslate2: it has
-# no Windows ARM64 wheel.) PySide6 6.12 needs macOS 14 or later.
-PySide6-Essentials==6.12.0
+# no Windows ARM64 wheel.) The Mac app runs on macOS 14 or later; build_mac.sh
+# checks every bundled binary against that.
+PySide6-Essentials==6.12.0; sys_platform != "darwin"
+# On macOS, PySide6 6.10 and later are compiled for macOS 15 (6.12: macOS 26)
+# whatever their wheel tags say; 6.9.3's binaries really run on macOS 12.
+PySide6-Essentials==6.9.3; sys_platform == "darwin"
 av==19.0.1
 numpy==2.5.4
 # ONNX Runtime stopped publishing Intel Mac wheels after 1.23.
