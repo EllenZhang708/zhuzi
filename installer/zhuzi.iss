@@ -1,5 +1,5 @@
 ﻿; Inno Setup 6.3+ script. Built in CI (see .github/workflows/release.yml):
-;   set ZHUZI_VERSION=1.0.0  ZHUZI_ARCH=arm64|x64  ZHUZI_SOURCE=<dist\Zhuzi-1.0.0-arm64>
+;   set ZHUZI_VERSION=1.0.0  ZHUZI_ARCH=arm64|x64  ZHUZI_SOURCE=<dist\Zhuzi-arm64>
 ;   ISCC installer\zhuzi.iss
 ; The installed app keeps its data in %LOCALAPPDATA%\Zhuzi (no `portable` marker).
 
@@ -21,7 +21,8 @@ DisableProgramGroupPage=yes
 UninstallDisplayName=逐字
 UninstallDisplayIcon={app}\Zhuzi.exe
 OutputDir=..\dist
-OutputBaseFilename=Zhuzi-{#AppVersion}-{#Arch}-setup
+; No version in the name, so releases/latest/download/Zhuzi-<arch>-setup.exe always works.
+OutputBaseFilename=Zhuzi-{#Arch}-setup
 SetupIconFile=..\assets\icon.ico
 LicenseFile=..\LICENSE
 Compression=lzma2/ultra64

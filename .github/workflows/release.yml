@@ -50,7 +50,7 @@ jobs:
           choco install innosetup -y --no-progress
           $env:ZHUZI_VERSION = (Select-String -Path src\core.py -Pattern 'APP_VERSION = "([^"]+)"').Matches[0].Groups[1].Value
           $env:ZHUZI_ARCH = "${{ matrix.arch }}"
-          $env:ZHUZI_SOURCE = (Resolve-Path "dist\Zhuzi-$env:ZHUZI_VERSION-${{ matrix.arch }}").Path
+          $env:ZHUZI_SOURCE = (Resolve-Path "dist\Zhuzi-${{ matrix.arch }}").Path
           & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" installer\zhuzi.iss
 
       - uses: actions/upload-artifact@v4

@@ -3,17 +3,16 @@
 #   .\build.ps1                 # both arm64 and x64
 #   .\build.ps1 -Arch arm64     # just one
 #
-# Each build lands in dist\Zhuzi-<version>-<arch>\ (a portable folder: the
-# `portable` marker keeps settings and models beside the exe) and is zipped to
-# dist\Zhuzi-<version>-<arch>-portable.zip. The installer is made from the same
-# folder, minus the marker, by installer\zhuzi.iss (see the GitHub workflow).
+# Each build lands in dist\Zhuzi-<arch>\ (a portable folder: the `portable`
+# marker keeps settings and models beside the exe) and is zipped to
+# dist\Zhuzi-<arch>-portable.zip. The installer is made from the same folder,
+# minus the marker, by installer\zhuzi.iss (see the GitHub workflow).
 #
 # Environments (first time): .venv-arm64 from .python\arm64, .venv-x64 from an
 # x64 Python 3.12, each with `pip install -r requirements.txt`.
 param([ValidateSet("arm64", "x64", "both")] [string] $Arch = "both")
 
 $here = $PSScriptRoot
-$version = (Select-String -Path (Join-Path $here "src\core.py") -Pattern 'APP_VERSION = "([^"]+)"').Matches[0].Groups[1].Value
 $archs = if ($Arch -eq "both") { @("arm64", "x64") } else { @($Arch) }
 
 foreach ($a in $archs) {
@@ -49,7 +48,8 @@ foreach ($a in $archs) {
     foreach ($plugin in "networkinformation", "tls") { Remove-Item (Join-Path $qt "plugins\$plugin") -Recurse -ErrorAction SilentlyContinue }
     Get-ChildItem (Join-Path $qt "translations") -File | Where-Object { $_.Name -notmatch '_zh_CN\.qm$' } | Remove-Item
 
-    $out = Join-Path $here "dist\Zhuzi-$version-$a"
+    # No version in the names: README links to releases/latest/download/<name>, which must stay stable.
+    $out = Join-Path $here "dist\Zhuzi-$a"
     # Someone may be using this portable folder: keep its data (keys, models) across builds.
     $kept = Join-Path $work "kept-data"
     if (Test-Path $kept) { Remove-Item $kept -Recurse -Force }

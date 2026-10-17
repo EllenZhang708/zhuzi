@@ -4,6 +4,13 @@
 
 <p align="center">把播客誊成文字。贴一个小宇宙链接，或拖入一段音频，半分钟拿到带时间戳的逐字稿。</p>
 
+<p align="center">
+  <a href="https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-x64-setup.exe"><img src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-Windows%20%E7%89%88-2A5BDB?style=for-the-badge" alt="下载 Windows 版"></a>
+  &nbsp;
+  <a href="https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-arm64-setup.exe"><img src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-ARM%20%E7%89%88%EF%BC%88%E9%AA%81%E9%BE%99%E7%AD%89%EF%BC%89-15171C?style=for-the-badge" alt="下载 ARM 版（骁龙等）"></a>
+</p>
+<p align="center"><sub>点按钮直接下载最新版安装包 · 大多数电脑选 Windows 版 · <a href="https://github.com/EllenZhang708/zhuzi/releases/latest">全部下载与更新说明</a></sub></p>
+
 <p align="center"><img src="docs/screenshot-light.png" width="720" alt="逐字的主界面"></p>
 
 ## 能做什么
@@ -17,12 +24,14 @@
 
 ## 下载
 
-在 [Releases](../../releases) 页面下载：
+点下面的链接直接下载最新版：
 
-| 你的电脑 | 安装版 | 免安装版 |
+| 你的电脑 | 安装版（推荐） | 免安装版 |
 |---|---|---|
-| 大多数 Windows 电脑（Intel / AMD） | `Zhuzi-x.y.z-x64-setup.exe` | `Zhuzi-x.y.z-x64-portable.zip` |
-| 骁龙等 ARM 芯片的 Windows 电脑 | `Zhuzi-x.y.z-arm64-setup.exe` | `Zhuzi-x.y.z-arm64-portable.zip` |
+| 大多数 Windows 电脑（Intel / AMD） | [Zhuzi-x64-setup.exe](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-x64-setup.exe) | [Zhuzi-x64-portable.zip](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-x64-portable.zip) |
+| 骁龙等 ARM 芯片的 Windows 电脑 | [Zhuzi-arm64-setup.exe](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-arm64-setup.exe) | [Zhuzi-arm64-portable.zip](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-arm64-portable.zip) |
+
+历史版本和更新说明在 [Releases](https://github.com/EllenZhang708/zhuzi/releases) 页面。
 
 不确定是哪种？打开「设置 → 系统 → 系统信息」，看「系统类型」：写着“基于 ARM”就选 arm64，否则选 x64。
 
