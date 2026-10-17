@@ -4,6 +4,8 @@
     Zhuzi.exe --selftest SOURCE [--engine cloud|local] [--clip N]  run one job without the window
     Zhuzi.exe --uitest SOURCE --out DIR [--clip N]              drive the window through one job
     Zhuzi.exe --screenshot DIR                                  render each screen to PNG files
+
+On a Mac the program is 逐字.app/Contents/MacOS/Zhuzi, with the same options.
 """
 from __future__ import annotations
 
@@ -11,6 +13,7 @@ import argparse
 import json
 import logging
 import os
+import ssl
 import subprocess
 import sys
 import threading
@@ -70,6 +73,7 @@ def selftest(source: str, clip: float, engine: str, out: Path) -> int:
         report["title"] = ep.title
         result = core.run_job(ep, engine, out, LogEvents(), threading.Event(), clip_seconds=clip or None)
         report.update(ok=True, path=str(result.path), segments=result.segments, model=result.engine)
+        report["cafile"] = ssl.get_default_verify_paths().cafile  # a frozen Mac build must use its own
     except Exception as e:
         log.exception("self-test failed")
         report.update(ok=False, error=f"{type(e).__name__}: {e}")
@@ -110,6 +114,7 @@ from PySide6.QtWidgets import (  # noqa: E402
 
 import cloud  # noqa: E402
 import local  # noqa: E402
+import secrets_store  # noqa: E402
 import theme  # noqa: E402
 import updates  # noqa: E402
 from widgets import (  # noqa: E402
@@ -331,7 +336,7 @@ class SetupDialog(QDialog):
         )
         self.field.setPlaceholderText(f"{p.key_prefix}…")
         self.field.setText(core.get_key(self.settings, key))
-        self._say("密钥加密保存在本机，只有你这个 Windows 账户能读取。")
+        self._say(secrets_store.WHERE)
         self._show_status()
 
     def _found(self, key: str, ok: bool):
@@ -385,7 +390,7 @@ class MainWindow(QWidget):
         super().__init__()
         self.setObjectName("Root")
         self.setWindowTitle("逐字")
-        self.setWindowIcon(QIcon(str(ASSETS / "icon.ico")))
+        self.setWindowIcon(QIcon(str(ASSETS / ("icon.ico" if sys.platform == "win32" else "icon.png"))))
         self.resize(980, 760)
         self.setMinimumSize(860, 680)
         self.setAcceptDrops(True)
@@ -651,7 +656,9 @@ class MainWindow(QWidget):
     # ── compose ──
 
     def _prefill_from_clipboard(self):
-        if self.source.text() or self.stack.currentIndex() != 0:
+        # Not on a Mac: recent macOS asks the user each time an app reads the
+        # clipboard on its own, which would greet every return to the window.
+        if sys.platform == "darwin" or self.source.text() or self.stack.currentIndex() != 0:
             return
         text = QGuiApplication.clipboard().text()
         eid = core.find_episode_id(text)
@@ -870,6 +877,8 @@ class MainWindow(QWidget):
             self._set_percent(1.0)
             self._show_state("done")
             self.detail.setText(f"共 {len(self.transcript.paragraphs.groups)} 段 · 已保存为 {result.path.name}")
+        if result.path.parent != self.out_dir:  # the chosen folder refused the write
+            self.detail.setText(f"没有权限写入所选文件夹，已改存到 {result.path.parent}")
         QApplication.alert(self)
 
     def _failed(self, message: str):
@@ -912,11 +921,20 @@ class MainWindow(QWidget):
 
     def _open_result(self):
         if self.result and self.result.path and self.result.path.exists():
-            os.startfile(self.result.path)
+            if sys.platform == "win32":
+                os.startfile(self.result.path)
+            else:
+                QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.result.path)))
 
     def _open_folder(self):
+        """Show the transcript selected in Explorer or Finder."""
         if self.result and self.result.path:
-            subprocess.Popen(["explorer", "/select,", str(self.result.path)])
+            if sys.platform == "win32":
+                subprocess.Popen(["explorer", "/select,", str(self.result.path)])
+            elif sys.platform == "darwin":
+                subprocess.Popen(["open", "-R", str(self.result.path)])
+            else:
+                QDesktopServices.openUrl(QUrl.fromLocalFile(str(self.result.path.parent)))
 
     # ── helpers ──
 
@@ -1006,7 +1024,8 @@ def screenshots(folder: Path) -> int:
     cover = None  # the waveform stand-in
     for name, pal in (("light", theme.LIGHT), ("dark", theme.DARK)):
         win = MainWindow(palette=pal, welcome=False)
-        win.out_label.setText(r"C:\Users\me\Documents\逐字稿")  # screenshots get published; show no real paths
+        # Screenshots get published; show no real paths.
+        win.out_label.setText("/Users/me/Documents/逐字稿" if sys.platform == "darwin" else r"C:\Users\me\Documents\逐字稿")
         win.show()
         settle()
         win.grab().save(str(folder / f"{name}-1-empty.png"))

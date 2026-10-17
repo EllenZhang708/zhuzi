@@ -56,7 +56,7 @@ def transcribe(samples: np.ndarray, ep: core.Episode, events: core.Events, cance
     try:
         recognizer = _recognizer()
     except Exception as e:
-        raise core.VerbatimError("识别模型载入失败，可尝试删除 data\\models\\sense-voice 后重试。") from e
+        raise core.VerbatimError(f"识别模型载入失败，可尝试删除 {FOLDER} 后重试。") from e
 
     def segments() -> Iterator[core.Segment]:
         events.stage(2)

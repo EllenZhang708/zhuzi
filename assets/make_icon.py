@@ -1,8 +1,8 @@
 """Build the app icon from AppIcon.png (the artwork, with transparent corners).
 
-Writes icon.ico (all Windows sizes), icon.png (for the window header) and
-icon-preview.png next to this script. Small sizes get a light sharpen so the
-artwork doesn't go soft when shrunk.
+Writes icon.ico (all Windows sizes), icon.icns (macOS), icon.png (for the
+window header) and icon-preview.png next to this script. Small sizes get a
+light sharpen so the artwork doesn't go soft when shrunk.
 """
 from pathlib import Path
 
@@ -22,11 +22,26 @@ def render(art: Image.Image, size: int) -> Image.Image:
     return out
 
 
+def mac_icon(art: Image.Image) -> Image.Image:
+    """Apple's grid: the tile is 824 of 1024 px, centred, over a soft shadow,
+    so the icon sits at the same size as the system's own in the Dock."""
+    canvas, tile, top = 1024, 824, 100
+    body = art.crop(art.getchannel("A").getbbox()).resize((tile, tile), Image.LANCZOS)
+    shadow = Image.new("RGBA", (canvas, canvas), (0, 0, 0, 0))
+    shade = body.getchannel("A").point(lambda a: a * 0.3)
+    shadow.paste((0, 0, 0, 255), (top, top + 12), shade)
+    out = shadow.filter(ImageFilter.GaussianBlur(14))
+    out.alpha_composite(body, (top, top))
+    return out
+
+
 def main():
     art = Image.open(SOURCE).convert("RGBA")
     sizes = [16, 20, 24, 32, 40, 48, 64, 96, 128, 256]
     images = [render(art, n) for n in sizes]
     images[-1].save(HERE / "icon.ico", sizes=[(n, n) for n in sizes], append_images=images[:-1])
+    mac = mac_icon(art)
+    mac.save(HERE / "icon.icns", append_images=[render(mac, n) for n in (16, 32, 64, 128, 256, 512)])
     render(art, 512).save(HERE / "icon.png")
     preview = Image.new("RGBA", (sum(sizes) + 20 * len(sizes), 276), (244, 241, 234, 255))
     x = 10
@@ -34,7 +49,7 @@ def main():
         preview.alpha_composite(img, (x, 266 - img.height))
         x += img.width + 20
     preview.save(HERE / "icon-preview.png")
-    print("wrote", HERE / "icon.ico")
+    print("wrote", HERE / "icon.ico", "and", HERE / "icon.icns")
 
 
 if __name__ == "__main__":

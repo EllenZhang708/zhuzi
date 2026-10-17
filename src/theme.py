@@ -2,11 +2,19 @@
 accent taken (a shade deeper) from the app icon, used sparingly."""
 from __future__ import annotations
 
+import sys
 from dataclasses import dataclass
 
-SERIF = ["Noto Serif SC", "Source Han Serif SC", "SimSun"]
-SANS = ["Microsoft YaHei UI", "Segoe UI"]
-MONO = ["Consolas", "Cascadia Mono"]
+if sys.platform == "darwin":
+    # Fonts every Mac has. Naming a missing family costs Qt on macOS a slow
+    # alias scan, so the Windows names are left out here.
+    SERIF = ["Songti SC"]
+    SANS = ["PingFang SC"]
+    MONO = ["Menlo"]
+else:
+    SERIF = ["Noto Serif SC", "Source Han Serif SC", "SimSun"]
+    SANS = ["Microsoft YaHei UI", "Segoe UI"]
+    MONO = ["Consolas", "Cascadia Mono"]
 
 
 @dataclass(frozen=True)

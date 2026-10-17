@@ -1,5 +1,5 @@
-"""Offline checks for audio handling and the cloud filters (no network).
-Run: .venv-arm64\\Scripts\\python.exe tests\\test_cloud.py"""
+"""Offline checks for audio handling, the cloud filters and key storage (no network).
+Run: .venv-arm64\\Scripts\\python.exe tests\\test_cloud.py  (on a Mac: .venv-mac/bin/python tests/test_cloud.py)"""
 import io
 import sys
 from pathlib import Path
@@ -43,11 +43,17 @@ with av.open(io.BytesIO(data)) as c:
 tm = vad.TimeMap([(0, 2 * SR), (5 * SR, 7 * SR)])
 assert tm.original(1.0) == 1.0 and tm.original(2.5) == 5.5, (tm.original(1.0), tm.original(2.5))
 
-# Keys round-trip through DPAPI; unreadable values come back empty.
+# Keys round-trip through DPAPI (Windows) or the Keychain (macOS, under a test
+# service name, read back from the Keychain itself); unreadable values come back empty.
+secrets_store.SERVICE = "Zhuzi-test"
 s: dict = {}
 core.set_key(s, "groq", "gsk_example")
-assert s["keys"]["groq"].startswith("dpapi:") and core.get_key(s, "groq") == "gsk_example"
+prefix = {"win32": "dpapi:", "darwin": "keychain:"}.get(sys.platform, "plain:")
+assert s["keys"]["groq"].startswith(prefix), s["keys"]["groq"][:12]
+secrets_store._cache.clear()
+assert core.get_key(s, "groq") == "gsk_example"
 assert secrets_store.unprotect("dpapi:AAAA") == ""
+assert secrets_store.unprotect("keychain:missing") == ""
 
 # Providers that have a key, preferred first.
 core.set_key(s, "siliconflow", "sk-example")
@@ -55,6 +61,9 @@ s["provider"] = "groq"
 assert [p.key for p in cloud.order(s)] == ["groq", "siliconflow"]
 core.set_key(s, "groq", "")
 assert [p.key for p in cloud.order(s)] == ["siliconflow"]
+core.set_key(s, "siliconflow", "")  # leaves no test items in the Keychain
+secrets_store._cache.clear()
+assert secrets_store.unprotect(prefix + "siliconflow") == "" or prefix == "plain:"
 
 # Homophones of the show's names are corrected (same tones only).
 fix = core.name_fixer(core.Episode(title="E46", source="", podcast="无人知晓", author="孟岩"))

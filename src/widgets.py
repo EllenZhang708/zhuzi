@@ -35,7 +35,15 @@ from theme import MONO, SERIF, Palette
 
 def animations_enabled() -> bool:
     """Honour Windows' Animation effects switch (Settings → Accessibility →
-    Visual effects); when it is off, everything here holds still."""
+    Visual effects) and the Mac's Reduce motion; when motion is off, everything
+    here holds still."""
+    if sys.platform == "darwin":
+        try:
+            import mac
+
+            return not mac.reduce_motion()
+        except (OSError, AttributeError):
+            return True
     if sys.platform != "win32":
         return True
     import ctypes

@@ -23,6 +23,7 @@ tests/ui*/
 
 # Generated from AppIcon.png by assets/make_icon.py
 assets/icon.ico
+assets/icon.icns
 assets/icon.png
 assets/icon-preview.png
 

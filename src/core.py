@@ -30,6 +30,14 @@ APP_VERSION = "1.0.0"
 
 log = logging.getLogger("zhuzi")
 
+# A frozen macOS build's Python looks for CA certificates where the build
+# machine's OpenSSL kept them, which a user's Mac doesn't have; every HTTPS
+# request would fail. Point it at the bundled certifi set instead.
+if sys.platform == "darwin" and getattr(sys, "frozen", False) and "SSL_CERT_FILE" not in os.environ:
+    import certifi
+
+    os.environ["SSL_CERT_FILE"] = certifi.where()
+
 
 def _documents() -> Path:
     """The user's Documents folder, wherever OneDrive or policy has moved it."""
@@ -60,9 +68,11 @@ def _locations() -> tuple[Path, Path, bool]:
     """(data folder, default output folder, portable?).
 
     A build with a file named `portable` beside the exe keeps everything next
-    to itself; an installed build uses %LOCALAPPDATA% and Documents; running
-    from source uses the project folder."""
+    to itself; an installed build uses %LOCALAPPDATA% (on a Mac, Application
+    Support) and Documents; running from source uses the project folder."""
     if getattr(sys, "frozen", False):
+        if sys.platform == "darwin":
+            return Path.home() / "Library" / "Application Support" / APP_ID, _documents() / "逐字稿", False
         exe_dir = Path(sys.executable).resolve().parent
         if (exe_dir / "portable").exists():
             return exe_dir / "data", exe_dir.parent / "逐字稿", True
@@ -77,13 +87,14 @@ MODELS_DIR = DATA_DIR / "models"
 AUDIO_DIR = DATA_DIR / "audio"
 LOG_DIR = DATA_DIR / "logs"
 SETTINGS_FILE = DATA_DIR / "settings.json"
+FALLBACK_OUTPUT = DATA_DIR / "逐字稿"  # used when the chosen folder refuses writes
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
     "(KHTML, like Gecko) Chrome/126.0 Safari/537.36"
 )
 SAMPLE_RATE = 16000
-AUDIO_EXTS = {".mp3", ".m4a", ".aac", ".wav", ".flac", ".ogg", ".opus", ".mp4", ".webm", ".wma"}
+AUDIO_EXTS = {".mp3", ".m4a", ".aac", ".wav", ".flac", ".ogg", ".opus", ".mp4", ".webm", ".wma", ".aif", ".aiff"}
 
 
 class VerbatimError(Exception):
@@ -135,9 +146,9 @@ def get_key(settings: dict, provider: str) -> str:
 def set_key(settings: dict, provider: str, key: str) -> None:
     keys = settings.setdefault("keys", {})
     if key:
-        keys[provider] = secrets_store.protect(key)
-    else:
-        keys.pop(provider, None)
+        keys[provider] = secrets_store.protect(provider, key)
+    elif provider in keys:
+        secrets_store.forget(keys.pop(provider))
 
 
 # ── Sources ─────────────────────────────────────────────────────────────
@@ -577,17 +588,28 @@ def _mb(n: int) -> str:
 
 
 class _StayAwake:
-    """Keep Windows working while a job runs.
+    """Keep the computer working while a job runs.
 
-    Holds power requests so the machine does not idle into sleep and the process
-    is not suspended when the screen goes dark (Modern Standby), and opts the
-    process out of EcoQoS throttling, which otherwise slows a window that is in
-    the background. Closing the lid or choosing Sleep still pauses the job."""
+    Windows: holds power requests so the machine does not idle into sleep and
+    the process is not suspended when the screen goes dark (Modern Standby), and
+    opts the process out of EcoQoS throttling, which otherwise slows a window
+    that is in the background. macOS: declares a user-initiated activity, which
+    blocks idle sleep and keeps App Nap away. Closing the lid or choosing Sleep
+    still pauses the job."""
 
     SYSTEM_REQUIRED, EXECUTION_REQUIRED = 1, 3  # POWER_REQUEST_TYPE
+    REASON = "逐字：正在誊写音频"
 
     def __enter__(self):
-        self.handle = None
+        self.handle = self.activity = None
+        if sys.platform == "darwin":
+            try:
+                import mac
+
+                self.activity = mac.begin_activity(self.REASON)
+            except (OSError, AttributeError):
+                log.warning("Could not declare the activity; the Mac may sleep mid-job", exc_info=True)
+            return self
         if sys.platform != "win32":
             return self
         import ctypes
@@ -624,7 +646,7 @@ class _StayAwake:
             _fields_ = [("Version", wintypes.ULONG), ("Flags", wintypes.DWORD), ("Reason", Reason)]
 
         context = ReasonContext(0, 0x1)  # POWER_REQUEST_CONTEXT_SIMPLE_STRING
-        context.Reason.SimpleReasonString = "逐字：正在誊写音频"
+        context.Reason.SimpleReasonString = self.REASON
         k32.PowerCreateRequest.restype = wintypes.HANDLE
         handle = k32.PowerCreateRequest(ctypes.byref(context))
         if handle and handle != wintypes.HANDLE(-1).value:
@@ -636,6 +658,10 @@ class _StayAwake:
         return self
 
     def __exit__(self, *_exc):
+        if self.activity:
+            import mac
+
+            mac.end_activity(self.activity)
         if self.handle:
             import ctypes
             from ctypes import wintypes
@@ -716,8 +742,16 @@ def run_job(
         segments, stopped = collect(segment_iter, events)
         stopped_at = segments[-1].end if stopped else None
 
-        path = unique_path(out_dir, safe_filename(f"{ep.title}-逐字稿"))
-        write_markdown(path, ep, segments, label(), stopped_at)
+        name = safe_filename(f"{ep.title}-逐字稿")
+        try:
+            path = unique_path(out_dir, name)  # even looking inside a refused folder fails
+            write_markdown(path, ep, segments, label(), stopped_at)
+        except PermissionError:
+            # macOS asks before an app may write into Documents; if that was
+            # declined (or the folder is locked some other way), keep the work anyway.
+            log.warning("No permission to write %s; saving to %s", path, FALLBACK_OUTPUT, exc_info=True)
+            path = unique_path(FALLBACK_OUTPUT, name)
+            write_markdown(path, ep, segments, label(), stopped_at)
         if not ep.local_path and stopped_at is None:
             audio_path.unlink(missing_ok=True)  # the episode page stays the reference
         return Result(path, len(segments), stopped_at, label())

@@ -1,6 +1,8 @@
-# Builds Zhuzi for Windows x64 and ARM64 on GitHub's own machines, runs the
-# offline tests, and makes a portable zip and an installer for each.
-# Pushing a tag like v1.0.0 also drafts a GitHub Release with all four files.
+# Builds Zhuzi on GitHub's own machines and runs the tests:
+#   Windows x64 and ARM64: a portable zip and an installer each;
+#   macOS Apple silicon and Intel: a disk image each, after checking the built
+#   app end to end (tests/check_mac_app.sh).
+# Pushing a tag like v1.1.0 also drafts a GitHub Release with all six files.
 name: Release
 
 on:
@@ -60,8 +62,54 @@ jobs:
             dist/*-portable.zip
             dist/*-setup.exe
 
+  mac:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - flavor: apple-silicon
+            runner: macos-15
+          - flavor: intel
+            runner: macos-15-intel  # GitHub's last Intel Mac machines
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m venv .venv-mac
+          .venv-mac/bin/python -m pip install --upgrade pip
+          .venv-mac/bin/python -m pip install -r requirements.txt
+
+      - name: Offline tests
+        run: |
+          .venv-mac/bin/python tests/test_text.py
+          .venv-mac/bin/python tests/test_cloud.py
+
+      - name: Build
+        run: bash build_mac.sh
+
+      - name: Check the built app
+        run: bash tests/check_mac_app.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zhuzi-mac-${{ matrix.flavor }}
+          path: dist/*.dmg
+
+      # Logs, the test transcript and screenshots of every screen, for review.
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: check-mac-${{ matrix.flavor }}
+          path: build/mac/check
+
   release:
-    needs: build
+    needs: [build, mac]
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     permissions:
@@ -70,6 +118,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: artifacts
+          pattern: zhuzi-*  # the downloads, not the check reports
           merge-multiple: true
       - uses: softprops/action-gh-release@v2
         with:

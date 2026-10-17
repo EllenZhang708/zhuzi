@@ -9,7 +9,12 @@
   &nbsp;
   <a href="https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-arm64-setup.exe"><img src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-ARM%20%E7%89%88%EF%BC%88%E9%AA%81%E9%BE%99%E7%AD%89%EF%BC%89-15171C?style=for-the-badge" alt="下载 ARM 版（骁龙等）"></a>
 </p>
-<p align="center"><sub>点按钮直接下载最新版安装包 · 大多数电脑选 Windows 版 · <a href="https://github.com/EllenZhang708/zhuzi/releases/latest">全部下载与更新说明</a></sub></p>
+<p align="center">
+  <a href="https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-mac-apple-silicon.dmg"><img src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-Mac%20%E7%89%88%EF%BC%88Apple%20%E8%8A%AF%E7%89%87%EF%BC%89-2A5BDB?style=for-the-badge" alt="下载 Mac 版（Apple 芯片）"></a>
+  &nbsp;
+  <a href="https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-mac-intel.dmg"><img src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-Mac%20%E7%89%88%EF%BC%88Intel%EF%BC%89-15171C?style=for-the-badge" alt="下载 Mac 版（Intel）"></a>
+</p>
+<p align="center"><sub>点按钮直接下载最新版 · 大多数 Windows 电脑选 Windows 版，2020 年以后的 Mac 大多是 Apple 芯片 · <a href="https://github.com/EllenZhang708/zhuzi/releases/latest">全部下载与更新说明</a></sub></p>
 
 <p align="center"><img src="docs/screenshot-light.png" width="720" alt="逐字的主界面"></p>
 
@@ -30,12 +35,36 @@
 |---|---|---|
 | 大多数 Windows 电脑（Intel / AMD） | [Zhuzi-x64-setup.exe](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-x64-setup.exe) | [Zhuzi-x64-portable.zip](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-x64-portable.zip) |
 | 骁龙等 ARM 芯片的 Windows 电脑 | [Zhuzi-arm64-setup.exe](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-arm64-setup.exe) | [Zhuzi-arm64-portable.zip](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-arm64-portable.zip) |
+| Apple 芯片（M1、M2、M3、M4 等）的 Mac | [Zhuzi-mac-apple-silicon.dmg](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-mac-apple-silicon.dmg) | — |
+| Intel 处理器的 Mac | [Zhuzi-mac-intel.dmg](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-mac-intel.dmg) | — |
 
 历史版本和更新说明在 [Releases](https://github.com/EllenZhang708/zhuzi/releases) 页面。
 
-不确定是哪种？打开「设置 → 系统 → 系统信息」，看「系统类型」：写着“基于 ARM”就选 arm64，否则选 x64。
+不确定是哪种？
+- **Windows**：打开「设置 → 系统 → 系统信息」，看「系统类型」：写着“基于 ARM”就选 arm64，否则选 x64。
+- **Mac**：点屏幕左上角的苹果菜单 → 「关于本机」：写着“芯片 Apple M…”选 Apple 芯片版，写着“处理器 Intel…”选 Intel 版。Mac 版需要 macOS 14（Sonoma）或更新的系统。
 
-> 第一次运行时，Windows 可能提示“Windows 已保护你的电脑”或“未知发布者”——这是因为本项目没有购买代码签名证书。点「更多信息 → 仍要运行」即可。所有代码都公开在本仓库，可以自行检查或构建。
+> **Windows**：第一次运行时，可能提示“Windows 已保护你的电脑”或“未知发布者”——这是因为本项目没有购买代码签名证书。点「更多信息 → 仍要运行」即可。所有代码都公开在本仓库，可以自行检查或构建。
+
+### Mac：第一次打开要“放行”一次
+
+本项目没有加入 Apple 的付费开发者计划（每年 99 美元），所以 macOS 不认识逐字，第一次打开会拦下来。放行一次之后，就和普通 app 一样双击打开。
+
+1. 打开下载好的 `.dmg`，把「逐字」拖进「应用程序」。
+2. 在「应用程序」里双击逐字。系统提示“Apple 无法验证‘逐字’……”，点「完成」。
+3. 打开「系统设置 → 隐私与安全性」，拉到最下面，在“已阻止‘逐字’以保护 Mac”旁边点「仍要打开」，输入开机密码。
+4. 再双击逐字，点「仍要打开」。
+
+> macOS 14 上也可以在「应用程序」里按住 Control 键点逐字，选「打开」，再点「打开」。
+>
+> 熟悉“终端”的话，也可以用一条命令代替第 2–4 步：`xattr -dr com.apple.quarantine /Applications/逐字.app`
+>
+> 每次下载新版本替换旧版后，需要再放行一次。第一次保存文稿时，macOS 会问是否允许逐字访问「文稿」文件夹（逐字稿默认存在 文稿/逐字稿），点「允许」即可。
+
+### 卸载
+
+- **Windows**：「设置 → 应用 → 已安装的应用」里找到逐字，点「卸载」。
+- **Mac**：把「应用程序」里的逐字拖到废纸篓。设置和离线模型在 `~/Library/Application Support/Zhuzi`，密钥在「钥匙串访问」里名为 Zhuzi 的项目，想彻底清除可以一并删掉。转写好的文稿不会被删除。
 
 ## 第一次使用：拿一个免费密钥（约一分钟）
 
@@ -54,7 +83,7 @@
 
 - **云端识别**：音频会被压缩后上传到你选择的服务商（硅基流动或 Groq）处理，适用它们各自的条款。上传前会在本机去掉音乐和静音片段。
 - **本机离线识别**：音频不会离开你的电脑。
-- **密钥**：用 Windows 的 DPAPI 加密保存在本机，只有你这个 Windows 账户能解开。
+- **密钥**：Windows 上用系统的 DPAPI 加密保存在本机，只有你这个 Windows 账户能解开；Mac 上存在系统的「钥匙串」里。
 - 逐字没有自己的服务器，不收集任何数据。
 
 ## 版权提醒
@@ -79,7 +108,9 @@ model: "Groq whisper-large-v3-turbo"
 
 ## 从源码构建
 
-需要 Windows 10/11 和 Python 3.12。
+需要 Python 3.12。
+
+Windows 10/11：
 
 ```powershell
 python -m venv .venv-x64                # ARM 电脑用 ARM64 版 Python 建 .venv-arm64
@@ -89,7 +120,17 @@ python -m venv .venv-x64                # ARM 电脑用 ARM64 版 Python 建 .ve
 .\build.ps1 -Arch x64                    # 打包到 dist\
 ```
 
-安装程序由 `installer\zhuzi.iss`（Inno Setup 6.5+）生成；推送 `v*` 标签后，GitHub Actions 会自动构建 x64 与 ARM64 两个版本并起草 Release。
+macOS 14+：
+
+```bash
+python3.12 -m venv .venv-mac
+.venv-mac/bin/python -m pip install -r requirements.txt
+.venv-mac/bin/python src/app.py          # 直接运行
+./build_mac.sh                           # 打包当前芯片的 逐字.app 和 dist/ 里的 .dmg
+bash tests/check_mac_app.sh              # 检查打包好的 app：签名、离线转写、各个界面
+```
+
+Windows 安装程序由 `installer\zhuzi.iss`（Inno Setup 6.5+）生成。推送 `v*` 标签后，GitHub Actions 会自动构建 Windows（x64、ARM64）和 Mac（Apple 芯片、Intel）四个版本，在 Mac 上实际跑一遍检查，然后起草 Release。
 
 代码结构：
 
@@ -100,7 +141,8 @@ python -m venv .venv-x64                # ARM 电脑用 ARM64 版 Python 建 .ve
 | `src/cloud.py` | 云端识别：硅基流动、Groq，自动切换 |
 | `src/local.py` | 本机离线识别：SenseVoice（sherpa-onnx） |
 | `src/audio.py`、`src/vad.py` | 解码、切段、压缩；Silero 人声检测 |
-| `src/secrets_store.py` | 密钥加密（Windows DPAPI） |
+| `src/secrets_store.py` | 密钥保存（Windows DPAPI、macOS 钥匙串） |
+| `src/mac.py` | Mac 专用：誊写时不让系统睡眠、遵循“减弱动态效果” |
 
 ## 许可证
 
@@ -110,4 +152,4 @@ python -m venv .venv-x64                # ARM 电脑用 ARM64 版 Python 建 .ve
 
 ## English
 
-**Zhuzi (逐字)** turns a podcast episode — a Xiaoyuzhou link or a local audio file — into a timestamped Markdown transcript, in about half a minute for an 80-minute episode. It uses the free tiers of SiliconFlow (SenseVoice, reachable in mainland China) or Groq (Whisper large-v3-turbo), with your own key, or runs fully offline with SenseVoice. Native builds for Windows x64 and ARM64. Keys are encrypted with DPAPI; there is no server and no telemetry. MIT licensed; see THIRD_PARTY_NOTICES.md for bundled components.
+**Zhuzi (逐字)** turns a podcast episode — a Xiaoyuzhou link or a local audio file — into a timestamped Markdown transcript, in about half a minute for an 80-minute episode. It uses the free tiers of SiliconFlow (SenseVoice, reachable in mainland China) or Groq (Whisper large-v3-turbo), with your own key, or runs fully offline with SenseVoice. Native builds for Windows x64 and ARM64 and for macOS 14+ (Apple silicon and Intel). Keys are encrypted with DPAPI on Windows and kept in the Keychain on macOS; there is no server and no telemetry. The Mac app is not notarized, so the first launch must be allowed in System Settings → Privacy & Security → Open Anyway (or run `xattr -dr com.apple.quarantine /Applications/逐字.app`). MIT licensed; see THIRD_PARTY_NOTICES.md for bundled components.
