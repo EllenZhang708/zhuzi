@@ -8,8 +8,10 @@
 # version in the name: README links to releases/latest/download/<name>), and
 # the app itself in build/mac/逐字.app.
 #
-# Environment (first time): python3.12 -m venv .venv-mac, then
-# .venv-mac/bin/python -m pip install -r requirements.txt
+# Environment (first time), with Python 3.12 from python.org's macOS installer
+# (its binaries run on old systems; Homebrew's or a self-built one may not):
+#   python3.12 -m venv .venv-mac
+#   .venv-mac/bin/python -m pip install -r requirements.txt
 #
 # The app is signed ad hoc, not with an Apple Developer ID. Apple silicon needs
 # at least that to run it; the first launch still asks the user to allow it in
@@ -64,10 +66,26 @@ for part in Frameworks Resources; do
 done
 cp LICENSE THIRD_PARTY_NOTICES.md "$APP/Contents/Resources/"
 
-# The oldest macOS that every bundled library supports. (otool fails on the
-# files that aren't code; that's expected, hence the `|| true`.)
-MINOS=$( { find "$APP/Contents" -type f \( -name '*.so' -o -name '*.dylib' -o -perm -u+x \) -print0 \
-  | xargs -0 otool -l 2>/dev/null || true; } | awk '$1 == "minos" { print $2 }' | sort -t. -k1,1n -k2,2n | tail -1)
+# The oldest macOS every bundled binary supports. Each must run on macOS
+# $FLOOR (PySide6 6.12's own floor): a Python built for the build machine's
+# newer system would otherwise raise it silently (use python.org's installer,
+# not a locally compiled Python). otool fails on files that aren't code,
+# hence the `|| true`.
+FLOOR=14.0
+REPORT="$WORK/minos.txt"
+: > "$REPORT"
+while IFS= read -r -d '' f; do
+  v=$(otool -l "$f" 2>/dev/null | awk '$1 == "minos" { print $2; exit }') || true
+  if [ -n "$v" ]; then printf '%s\t%s\n' "$v" "${f#"$APP"/}" >> "$REPORT"; fi
+done < <(find "$APP/Contents" -type f \( -name '*.so' -o -name '*.dylib' -o -perm -u+x \) -print0)
+MINOS=$(cut -f1 "$REPORT" | sort -t. -k1,1n -k2,2n | tail -1)
+TOO_NEW=$(awk -F'\t' -v floor="$FLOOR" 'function n(s, p) { split(s, p, "."); return p[1] * 1000 + p[2] }
+  n($1) > n(floor)' "$REPORT")
+if [ -n "$TOO_NEW" ]; then
+  echo "These need a newer macOS than $FLOOR:" >&2
+  echo "$TOO_NEW" >&2
+  exit 1
+fi
 
 PLIST="$APP/Contents/Info.plist"
 plist() { plutil -replace "$1" "$2" "$3" "$PLIST"; }
@@ -75,7 +93,7 @@ plist CFBundleName -string "逐字"
 plist CFBundleDisplayName -string "逐字"
 plist CFBundleShortVersionString -string "$VERSION"
 plist CFBundleVersion -string "$VERSION"
-plist LSMinimumSystemVersion -string "${MINOS:-14.0}"
+plist LSMinimumSystemVersion -string "${MINOS:-$FLOOR}"
 plist LSApplicationCategoryType -string public.app-category.productivity
 plist NSHumanReadableCopyright -string "MIT License · github.com/EllenZhang708/zhuzi"
 plist NSHighResolutionCapable -bool YES  # without it, Retina screens get a blurry upscale

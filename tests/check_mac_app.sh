@@ -23,6 +23,8 @@ codesign --verify --deep --strict --verbose=2 "$APP"
 codesign -dv "$APP" 2>&1 | tee "$OUT/codesign.txt"
 plutil -p "$APP/Contents/Info.plist" | tee "$OUT/Info.plist.txt"
 file "$BIN" | tee "$OUT/arch.txt"
+sort -t. -k1,1nr -k2,2nr build/mac/minos.txt > "$OUT/minos.txt"  # newest first
+head -5 "$OUT/minos.txt"
 du -sh "$APP" dist/*.dmg | tee "$OUT/sizes.txt"
 
 echo "== the disk image"

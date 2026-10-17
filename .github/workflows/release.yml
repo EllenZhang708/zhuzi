@@ -75,13 +75,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
+      # Python from python.org's installer, not actions/setup-python: that one is
+      # compiled on the build machine and would demand its newer macOS of every
+      # user. (3.12.10 is the last 3.12 with a macOS installer.)
+      - name: Python 3.12 from python.org
+        run: |
+          curl -fsSL -o "$RUNNER_TEMP/python.pkg" https://www.python.org/ftp/python/3.12.10/python-3.12.10-macos11.pkg
+          sudo installer -pkg "$RUNNER_TEMP/python.pkg" -target /
 
       - name: Install dependencies
         run: |
-          python -m venv .venv-mac
+          /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 -m venv .venv-mac
           .venv-mac/bin/python -m pip install --upgrade pip
           .venv-mac/bin/python -m pip install -r requirements.txt
 

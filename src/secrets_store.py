@@ -65,7 +65,10 @@ _cache: dict[str, str] = {}  # account -> secret; each read is a process launch
 
 
 def _security(*args: str, stdin: str | None = None) -> subprocess.CompletedProcess:
-    return subprocess.run([SECURITY, *args], input=stdin, capture_output=True, text=True, timeout=20)
+    # UTF-8 spelled out: an app opened from Finder may start with no locale set.
+    return subprocess.run(
+        [SECURITY, *args], input=stdin, capture_output=True, encoding="utf-8", errors="replace", timeout=20
+    )
 
 
 def _keychain_set(account: str, secret: str) -> None:
