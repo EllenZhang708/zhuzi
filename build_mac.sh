@@ -101,7 +101,7 @@ plist CFBundleVersion -string "$SHORT"
 plist CFBundleGetInfoString -string "逐字 $VERSION"
 plist LSMinimumSystemVersion -string "${MINOS:-$FLOOR}"
 plist LSApplicationCategoryType -string public.app-category.productivity
-plist NSHumanReadableCopyright -string "MIT License · github.com/EllenZhang708/zhuzi"
+plist NSHumanReadableCopyright -string "© 2026 EllenZhang708 · MIT License · github.com/EllenZhang708/zhuzi"
 plist NSHighResolutionCapable -bool YES  # without it, Retina screens get a blurry upscale
 plist NSPrincipalClass -string NSApplication
 # Shown when macOS asks whether 逐字 may use these folders.
