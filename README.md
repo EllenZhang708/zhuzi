@@ -10,11 +10,11 @@
   <a href="https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-arm64-setup.exe"><img src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-ARM%20%E7%89%88%EF%BC%88%E9%AA%81%E9%BE%99%E7%AD%89%EF%BC%89-15171C?style=for-the-badge" alt="下载 ARM 版（骁龙等）"></a>
 </p>
 <p align="center">
-  <a href="https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-mac-apple-silicon.dmg"><img src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-Mac%20%E7%89%88%EF%BC%88Apple%20%E8%8A%AF%E7%89%87%EF%BC%89-2A5BDB?style=for-the-badge" alt="下载 Mac 版（Apple 芯片）"></a>
+  <a href="https://github.com/EllenZhang708/zhuzi/releases/download/v1.1.0/Zhuzi-mac-apple-silicon.dmg"><img src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-Mac%20%E7%89%88%EF%BC%88Apple%20%E8%8A%AF%E7%89%87%EF%BC%89-2A5BDB?style=for-the-badge" alt="下载 Mac 版（Apple 芯片）"></a>
   &nbsp;
-  <a href="https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-mac-intel.dmg"><img src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-Mac%20%E7%89%88%EF%BC%88Intel%EF%BC%89-15171C?style=for-the-badge" alt="下载 Mac 版（Intel）"></a>
+  <a href="https://github.com/EllenZhang708/zhuzi/releases/download/v1.1.0/Zhuzi-mac-intel.dmg"><img src="https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-Mac%20%E7%89%88%EF%BC%88Intel%EF%BC%89-15171C?style=for-the-badge" alt="下载 Mac 版（Intel）"></a>
 </p>
-<p align="center"><sub>点按钮直接下载最新版 · 大多数 Windows 电脑选 Windows 版，2020 年以后的 Mac 大多是 Apple 芯片 · <a href="https://github.com/EllenZhang708/zhuzi/releases/latest">全部下载与更新说明</a></sub></p>
+<p align="center"><sub>点按钮直接下载最新版 · 大多数 Windows 电脑选 Windows 版，2020 年以后的 Mac 大多是 Apple 芯片 · <a href="https://github.com/EllenZhang708/zhuzi/releases">全部下载与更新说明</a></sub></p>
 
 <p align="center"><img src="docs/screenshot-light.png" width="720" alt="逐字的主界面"></p>
 
@@ -35,8 +35,8 @@
 |---|---|---|
 | 大多数 Windows 电脑（Intel / AMD） | [Zhuzi-x64-setup.exe](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-x64-setup.exe) | [Zhuzi-x64-portable.zip](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-x64-portable.zip) |
 | 骁龙等 ARM 芯片的 Windows 电脑 | [Zhuzi-arm64-setup.exe](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-arm64-setup.exe) | [Zhuzi-arm64-portable.zip](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-arm64-portable.zip) |
-| Apple 芯片（M1、M2、M3、M4 等）的 Mac | [Zhuzi-mac-apple-silicon.dmg](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-mac-apple-silicon.dmg) | — |
-| Intel 处理器的 Mac | [Zhuzi-mac-intel.dmg](https://github.com/EllenZhang708/zhuzi/releases/latest/download/Zhuzi-mac-intel.dmg) | — |
+| Apple 芯片（M1、M2、M3、M4 等）的 Mac | [Zhuzi-mac-apple-silicon.dmg](https://github.com/EllenZhang708/zhuzi/releases/download/v1.1.0/Zhuzi-mac-apple-silicon.dmg) | — |
+| Intel 处理器的 Mac | [Zhuzi-mac-intel.dmg](https://github.com/EllenZhang708/zhuzi/releases/download/v1.1.0/Zhuzi-mac-intel.dmg) | — |
 
 历史版本和更新说明在 [Releases](https://github.com/EllenZhang708/zhuzi/releases) 页面。
 
