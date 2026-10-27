@@ -26,7 +26,7 @@ import secrets_store
 
 APP_NAME = "逐字"
 APP_ID = "Zhuzi"
-APP_VERSION = "1.1.0-beta.1"
+APP_VERSION = "1.1.0-beta.2"
 
 log = logging.getLogger("zhuzi")
 

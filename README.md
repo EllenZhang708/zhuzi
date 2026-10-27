@@ -42,7 +42,7 @@
 
 不确定是哪种？
 - **Windows**：打开「设置 → 系统 → 系统信息」，看「系统类型」：写着“基于 ARM”就选 arm64，否则选 x64。
-- **Mac**：点屏幕左上角的苹果菜单 → 「关于本机」：写着“芯片 Apple M…”选 Apple 芯片版，写着“处理器 Intel…”选 Intel 版。Mac 版需要 macOS 14（Sonoma）或更新的系统。
+- **Mac**：点屏幕左上角的苹果菜单 → 「关于本机」：写着“芯片 Apple M…”选 Apple 芯片版，写着“处理器 Intel…”选 Intel 版。Mac 版需要 macOS 12（Monterey）或更新的系统；如果「应用程序」里逐字的图标上有🚫，说明系统版本太旧。
 
 > **Windows**：第一次运行时，可能提示“Windows 已保护你的电脑”或“未知发布者”——这是因为本项目没有购买代码签名证书。点「更多信息 → 仍要运行」即可。所有代码都公开在本仓库，可以自行检查或构建。
 
@@ -50,14 +50,24 @@
 
 本项目没有加入 Apple 的付费开发者计划（每年 99 美元），所以 macOS 不认识逐字，第一次打开会拦下来。放行一次之后，就和普通 app 一样双击打开。
 
-1. 打开下载好的 `.dmg`，把「逐字」拖进「应用程序」。
-2. 在「应用程序」里双击逐字。系统提示“Apple 无法验证‘逐字’……”，点「完成」。
-3. 打开「系统设置 → 隐私与安全性」，拉到最下面，在“已阻止‘逐字’以保护 Mac”旁边点「仍要打开」，输入开机密码。
-4. 再双击逐字，点「仍要打开」。
+先打开下载好的 `.dmg`，把「逐字」拖进「应用程序」，然后按系统版本放行（苹果菜单 →「关于本机」可以看到版本）：
 
-> macOS 14 上也可以在「应用程序」里按住 Control 键点逐字，选「打开」，再点「打开」。
+**macOS 12、13、14（Monterey、Ventura、Sonoma）**
+
+1. 在「应用程序」里按住 Control 键点逐字（触控板上也可以两指轻点），选「打开」。
+2. 弹出“无法验证开发者”的提示时，点「打开」。
+
+> 如果第 2 步只有「移到废纸篓」和「取消」：先点「取消」，打开「系统偏好设置 → 安全性与隐私 → 通用」（macOS 13、14 是「系统设置 → 隐私与安全性」），在“已阻止使用‘逐字’”旁边点「仍要打开」。
+
+**macOS 15 及以后（Sequoia、Tahoe）**
+
+1. 在「应用程序」里双击逐字。系统提示“Apple 无法验证‘逐字’……”，点「完成」。
+2. 打开「系统设置 → 隐私与安全性」，拉到最下面，在“已阻止‘逐字’以保护 Mac”旁边点「仍要打开」，输入开机密码。
+3. 再双击逐字，点「仍要打开」。
+
+> 系统是英文的话：「打开」是 Open，「仍要打开」是 Open Anyway，「系统偏好设置 → 安全性与隐私 → 通用」是 System Preferences → Security & Privacy → General。
 >
-> 熟悉“终端”的话，也可以用一条命令代替第 2–4 步：`xattr -dr com.apple.quarantine /Applications/逐字.app`
+> 熟悉“终端”的话，任何版本都可以用一条命令代替上面的步骤：`xattr -dr com.apple.quarantine /Applications/逐字.app`
 >
 > 每次下载新版本替换旧版后，需要再放行一次。第一次保存文稿时，macOS 会问是否允许逐字访问「文稿」文件夹（逐字稿默认存在 文稿/逐字稿），点「允许」即可。
 
@@ -120,11 +130,13 @@ python -m venv .venv-x64                # ARM 电脑用 ARM64 版 Python 建 .ve
 .\build.ps1 -Arch x64                    # 打包到 dist\
 ```
 
-macOS 14+：
+macOS（用 python.org 的 Python 3.12 安装包；打出来的 app 支持 macOS 12+）：
 
 ```bash
 python3.12 -m venv .venv-mac
-.venv-mac/bin/python -m pip install -r requirements.txt
+# 只装为 macOS 12 打包的依赖，否则在新系统上 pip 会选只支持新系统的版本
+.venv-mac/bin/python -m pip download --only-binary=:all: --platform "macosx_12_0_$(uname -m)" -d build/wheels -r requirements.txt
+.venv-mac/bin/python -m pip install --no-index --find-links build/wheels -r requirements.txt
 .venv-mac/bin/python src/app.py          # 直接运行
 ./build_mac.sh                           # 打包当前芯片的 逐字.app 和 dist/ 里的 .dmg
 bash tests/check_mac_app.sh              # 检查打包好的 app：签名、离线转写、各个界面
@@ -152,4 +164,4 @@ Windows 安装程序由 `installer\zhuzi.iss`（Inno Setup 6.5+）生成。推�
 
 ## English
 
-**Zhuzi (逐字)** turns a podcast episode — a Xiaoyuzhou link or a local audio file — into a timestamped Markdown transcript, in about half a minute for an 80-minute episode. It uses the free tiers of SiliconFlow (SenseVoice, reachable in mainland China) or Groq (Whisper large-v3-turbo), with your own key, or runs fully offline with SenseVoice. Native builds for Windows x64 and ARM64 and for macOS 14+ (Apple silicon and Intel). Keys are encrypted with DPAPI on Windows and kept in the Keychain on macOS; there is no server and no telemetry. The Mac app is not notarized, so the first launch must be allowed in System Settings → Privacy & Security → Open Anyway (or run `xattr -dr com.apple.quarantine /Applications/逐字.app`). MIT licensed; see THIRD_PARTY_NOTICES.md for bundled components.
+**Zhuzi (逐字)** turns a podcast episode — a Xiaoyuzhou link or a local audio file — into a timestamped Markdown transcript, in about half a minute for an 80-minute episode. It uses the free tiers of SiliconFlow (SenseVoice, reachable in mainland China) or Groq (Whisper large-v3-turbo), with your own key, or runs fully offline with SenseVoice. Native builds for Windows x64 and ARM64 and for macOS 12+ (Apple silicon and Intel). Keys are encrypted with DPAPI on Windows and kept in the Keychain on macOS; there is no server and no telemetry. The Mac app is not notarized, so the first launch must be allowed in System Settings → Privacy & Security → Open Anyway (or run `xattr -dr com.apple.quarantine /Applications/逐字.app`). MIT licensed; see THIRD_PARTY_NOTICES.md for bundled components.

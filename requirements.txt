@@ -1,16 +1,21 @@
 # Every package here ships wheels for win_amd64, win_arm64 and macOS (Apple
 # silicon and Intel), so Zhuzi builds natively for each. (No CTranslate2: it has
-# no Windows ARM64 wheel.) The Mac app runs on macOS 14 or later; build_mac.sh
-# checks every bundled binary against that.
+# no Windows ARM64 wheel.)
+#
+# The Mac app runs on macOS 12 (Monterey) or later, the newest system many
+# 2015-2017 Macs can install. Each Mac pin below is the newest version whose
+# binaries really load there: wheel tags can understate what a binary needs, so
+# this was read from the binaries themselves (their LC_BUILD_VERSION), and
+# build_mac.sh checks every bundled binary again. The Mac environment is also
+# installed from wheels built for macOS 12 only (see build_mac.sh), or pip would
+# take numpy's macOS 14 wheels on a newer machine.
 PySide6-Essentials==6.12.0; sys_platform != "darwin"
-# On macOS, PySide6 6.10 and later are compiled for macOS 15 (6.12: macOS 26)
-# whatever their wheel tags say; 6.9.3's binaries really run on macOS 12.
-PySide6-Essentials==6.9.3; sys_platform == "darwin"
-av==19.0.1
+PySide6-Essentials==6.9.3; sys_platform == "darwin"  # 6.10+: macOS 15 (6.12: macOS 26)
+av==19.0.1; sys_platform != "darwin"
+av==14.2.0; sys_platform == "darwin"  # 15.x: macOS 13; 16+ on Apple silicon: macOS 14
 numpy==2.5.4
-# ONNX Runtime stopped publishing Intel Mac wheels after 1.23.
-onnxruntime==1.31.0; sys_platform != "darwin" or platform_machine == "arm64"
-onnxruntime==1.23.2; sys_platform == "darwin" and platform_machine == "x86_64"
+onnxruntime==1.31.0; sys_platform != "darwin"
+onnxruntime==1.19.2; sys_platform == "darwin"  # 1.20+: macOS 13
 sherpa-onnx==1.13.8
 opencc-python-reimplemented==0.1.7
 pypinyin==0.55.0

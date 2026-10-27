@@ -83,11 +83,16 @@ jobs:
           curl -fsSL -o "$RUNNER_TEMP/python.pkg" https://www.python.org/ftp/python/3.12.10/python-3.12.10-macos11.pkg
           sudo installer -pkg "$RUNNER_TEMP/python.pkg" -target /
 
+      # Only wheels built for macOS 12, the oldest system the app supports (see
+      # build_mac.sh): on this newer machine pip would otherwise prefer wheels
+      # that need it, such as numpy's macOS 14 ones.
       - name: Install dependencies
         run: |
           /Library/Frameworks/Python.framework/Versions/3.12/bin/python3.12 -m venv .venv-mac
           .venv-mac/bin/python -m pip install --upgrade pip
-          .venv-mac/bin/python -m pip install -r requirements.txt
+          .venv-mac/bin/python -m pip download --only-binary=:all: --platform "macosx_12_0_$(uname -m)" -d build/wheels -r requirements.txt
+          .venv-mac/bin/python -m pip install --no-index --find-links build/wheels -r requirements.txt
+          .venv-mac/bin/python -m pip list
 
       - name: Offline tests
         run: |

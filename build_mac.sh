@@ -9,9 +9,14 @@
 # the app itself in build/mac/逐字.app.
 #
 # Environment (first time), with Python 3.12 from python.org's macOS installer
-# (its binaries run on old systems; Homebrew's or a self-built one may not):
+# (its binaries run on old systems; Homebrew's or a self-built one may not), and
+# only wheels built for macOS 12, the oldest system the app supports (FLOOR
+# below): on a newer Mac, pip would otherwise prefer wheels that need that newer
+# system, such as numpy's macOS 14 ones.
 #   python3.12 -m venv .venv-mac
-#   .venv-mac/bin/python -m pip install -r requirements.txt
+#   .venv-mac/bin/python -m pip download --only-binary=:all: \
+#     --platform "macosx_12_0_$(uname -m)" -d build/wheels -r requirements.txt
+#   .venv-mac/bin/python -m pip install --no-index --find-links build/wheels -r requirements.txt
 #
 # The app is signed ad hoc, not with an Apple Developer ID. Apple silicon needs
 # at least that to run it; the first launch still asks the user to allow it in
@@ -68,11 +73,10 @@ done
 cp LICENSE THIRD_PARTY_NOTICES.md "$APP/Contents/Resources/"
 
 # The oldest macOS every bundled binary supports. Each must run on macOS
-# $FLOOR (PySide6 6.12's own floor): a Python built for the build machine's
-# newer system would otherwise raise it silently (use python.org's installer,
-# not a locally compiled Python). otool fails on files that aren't code,
-# hence the `|| true`.
-FLOOR=14.0
+# $FLOOR (Monterey, the newest system many 2015-2017 Macs can install): a
+# library or Python built for a newer system would otherwise raise it silently.
+# otool fails on files that aren't code, hence the `|| true`.
+FLOOR=12.0
 REPORT="$WORK/minos.txt"
 : > "$REPORT"
 while IFS= read -r -d '' f; do

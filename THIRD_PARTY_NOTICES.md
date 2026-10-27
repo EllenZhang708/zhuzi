@@ -11,7 +11,7 @@ the components below, each under its own license.
 | FFmpeg (bundled by PyAV) | LGPL-3.0-or-later | https://ffmpeg.org/download.html |
 | x264, x265 (linked into PyAV's FFmpeg; Zhuzi only decodes audio and never calls them) | GPL-2.0-or-later | https://code.videolan.org/videolan/x264 · https://bitbucket.org/multicoreware/x265_git |
 | libopus, libvpx, dav1d, SVT-AV1, libwebp, zlib, libvmaf (bundled by PyAV) | BSD / zlib / ISC | see each project |
-| NumPy (with OpenBLAS on Windows; macOS builds use the system's Accelerate) | BSD-3-Clause | https://numpy.org/ |
+| NumPy (with OpenBLAS) | BSD-3-Clause | https://numpy.org/ |
 | certifi (macOS builds: the CA certificates for HTTPS) | MPL-2.0 | https://github.com/certifi/python-certifi |
 | ONNX Runtime | MIT | https://github.com/microsoft/onnxruntime |
 | sherpa-onnx | Apache-2.0 | https://github.com/k2-fsa/sherpa-onnx |
